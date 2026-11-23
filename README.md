@@ -8,6 +8,49 @@
 
 ---
 
+## 📸 Скриншоты веб-интерфейса
+
+<p align="center">
+  <img src="screenshots/webui_preview.gif" alt="Карусель веб-интерфейса TRENDnet TV-IP121W Pro" width="100%">
+</p>
+
+<details open>
+  <summary><b>📺 Вкладка 1: Прямой эфир (Live Stream & RTSP)</b></summary>
+  <p align="center">
+    <a href="screenshots/1.png"><img src="screenshots/1.png" alt="Прямой эфир и RTSP" width="100%"></a>
+  </p>
+</details>
+
+<details>
+  <summary><b>⚙️ Вкладка 2: Настройки сенсора, видео и ИК-подсветки</b></summary>
+  <p align="center">
+    <a href="screenshots/2.png"><img src="screenshots/2.png" alt="Сенсор, ночной режим и видеопоток" width="100%"></a>
+  </p>
+</details>
+
+<details>
+  <summary><b>🕒 Вкладка 3: Штамп даты и времени (OSD)</b></summary>
+  <p align="center">
+    <a href="screenshots/3.png"><img src="screenshots/3.png" alt="Позиционирование и инверсия OSD" width="100%"></a>
+  </p>
+</details>
+
+<details>
+  <summary><b>🌐 Вкладка 4: Проводная сеть и Wi-Fi</b></summary>
+  <p align="center">
+    <a href="screenshots/4.png"><img src="screenshots/4.png" alt="Настройки Ethernet и Wi-Fi" width="100%"></a>
+  </p>
+</details>
+
+<details>
+  <summary><b>🔧 Вкладка 5: Системные настройки и время</b></summary>
+  <p align="center">
+    <a href="screenshots/5.png"><img src="screenshots/5.png" alt="Синхронизация времени и перезагрузка" width="100%"></a>
+  </p>
+</details>
+
+---
+
 ## 🌟 Основные возможности
 
 * **RTSP сервер со звуком и аутентификацией:**
@@ -17,6 +60,10 @@
 * **Откалиброванное качество изображения (RFC 2435 In-Band DQT):**
   * Исправлена проблема выцветшего серого изображения и заниженного контраста на RTSP.
   * В заголовок RTP-пакетов внедряется аппаратная таблица квантования (DQT) сенсора камеры (`Q = 128`), восстанавливая полный динамический диапазон **0..255** и глубокий черный цвет.
+* **Управление ИК-подсветкой и ночным режимом:**
+  * Режимы: Авто (по датчику CDS с защитой от мерцания), Всегда ВКЛ, Всегда ВЫКЛ.
+  * Аппаратное накопление экспозиции матрицы OmniVision (`psensor -night=0..3` от 30 fps до 3.75 fps для полной темноты).
+  * Устранение аппаратного дребезга и ложных срабатываний от отражения ИК-лучей (микро-проба 80 мс с настраиваемой задержкой).
 * **Современный Web-интерфейс (HTML5):**
   * Темная адаптивная тема для ПК и смартфонов.
   * Полноценная форма авторизации с сохранением сессии.
@@ -115,14 +162,20 @@ python build.py
 ├── firmware/
 │   ├── FW_TV-IP121W_1.1.1...pck # Базовая оригинальная прошивка
 │   └── Firmware Upgrade...pdf   # Документация производителя
+├── screenshots/             # Скриншоты и демонстрационная анимация веб-интерфейса
 ├── src/
+│   ├── ir_ctrl.c                # Аппаратный контроллер ИК-подсветки и сенсора (PL1029 GPIO)
 │   ├── rtspd.c                  # Исходный код RTSP-сервера (RFC 2435 + Audio + DQT)
 │   └── set_osd_corner.c         # Утилита перемещения OSD через IPC Shared Memory
 ├── tools/
 │   ├── flash_firmware.py        # Утилита прошивки камеры по сети
 │   └── telnet_cmd.py            # Утилита удаленного выполнения команд через Telnet
 ├── extracted_rootfs/            # Дерево файлов корневой файловой системы
-│   ├── sbin/rtspd               # Скомпилированный RTSP-демон
+│   ├── sbin/
+│   │   ├── ir_ctrl              # Скомпилированный контроллер ИК
+│   │   ├── irled.sh             # Демон управления ИК с гистерезисом
+│   │   ├── rtspd                # Скомпилированный RTSP-демон
+│   │   └── set_osd_corner       # Утилита OSD
 │   └── server/cgi-bin/
 │       ├── custom_api.cgi       # REST API сервер
 │       └── index.html           # Современный Web UI
