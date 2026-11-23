@@ -1,0 +1,7 @@
+[PPPoEMail]
+Subject = PPPoE connected
+IP = IP
+CameraName = Camera Name
+Location = Location
+Time = Time
+Charset = 

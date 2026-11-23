@@ -1,0 +1,12 @@
+[main]
+filter=0
+debug=7
+authhidden=0
+
+[url]
+/mpgview.htm=/anony/mpgview.htm
+/jpgview.htm=/anony/jpgview.htm
+/cgi/mpeg4/mpeg4.cgi=/anony/mpeg4.cgi
+/cgi/mjpg/mjpeg.cgi=/anony/mjpeg.cgi
+/view2.cgi=/anony/view2.cgi
+

@@ -1,0 +1,60 @@
+TV-IP121W SecurView Wireless Day/Night Internet Camera
+
+Hardware Version: A1.xR
+
+Firmware Version: V1.1.1 build 36
+Release Date: 4/2013
+
+1. Upload.asp removed.
+2. Updated save configuration file encryption type.
+
+Notes:
+1. Please do not save the camera's configuration file from the old firmware and restore it after the firmware upgrade. 
+2. After a successful firmware upgrade, please reset the camera to factory default and reconfigure the camera. We strongly recommend that you change the camera's administrator's account password. 
+
+===============================
+Firmware Version: v1.1.1 built 35
+Release Date: 2/12
+
+1. Improved security 
+
+Note: 
+1.Please do not save the camera's configuration file from the old firmware and restore it after the firmware upgrade.
+2.After a successful firmware upgrade, please reset the camera to factory default and reconfigure the camera. 
+  We strongly recommend that you change the camera's administrator's account password.
+
+
+Firmware Version: v1.1.0 built 34
+Release Date: 5/11
+1. Resolved microphone issue with SecurView Pro
+
+Note: Please reset to factory default after firmware upgrade. 
+
+
+Firmware Version: V1.1.0 built 33
+Release Date: 3/2011
+
+1. Add model nubmer as the default camera name
+2. Change DDNS server from member.Dyndns.org to www.Dyndns.com
+3. Change default time zone to US pacific time
+4. Addressed watchdog issue, improved camera stability.
+5. Add http event notification.
+
+
+Firmware Version: V1.1.0 built 29 
+RElease Date: 10/2010
+
+1. Resolved stability issues. 
+2. Added watchdog capabilities to reboot camera if errors are detected
+
+
+Firmware Version: V1.1.0 built 25
+Release Date: 3/2010
+
+1. Enhanced support for Windows 7 and Internet Explorer 8
+2. Added authentication support for direct video streaming
+
+
+Firmware Version: V1.0.0 built 20  
+Release Date: 4/2009
+Note: Initial Release

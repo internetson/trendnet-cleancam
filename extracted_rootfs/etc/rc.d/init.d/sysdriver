@@ -1,0 +1,24 @@
+#!/bin/sh
+# 
+# sysdriver: launch system driver
+#
+
+RETVAL=0
+
+umask 077
+
+case "$1" in
+  start)
+	echo $"Starting encoder driver module: ---->"
+	/sbin/insmod /lib/modules/msg.o
+	/sbin/insmod /lib/modules/hwmon.o
+	/sbin/insmod /lib/modules/plmedia.o
+	echo "Launch hw monitor..."
+	/sbin/hwmon
+	RETVAL=$?
+	echo 
+	exit $RETVAL
+	;;
+  stop)
+	# donthing
+esac

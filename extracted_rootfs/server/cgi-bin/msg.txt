@@ -1,0 +1,83 @@
+[resolution]
+0=VGA
+1=QVGA
+2=QQVGA
+[enable]
+0=Disable
+1=Enable
+[quality]
+0=Lowest
+1=Low
+2=Normal
+3=High
+4=Highest
+[Policy]
+0=Static
+1=DHCP
+2=PPPoE
+[AuthMode]
+0=Open
+1=Shared-Key
+2=WPA-PSK
+3=WPA2-PSK
+4=WPA-PSK/WPA2-PSK
+[SecMethod]
+0=None
+1=WEP
+2=TKIP
+3=AES
+4=Auto(TKIP/AES)
+[Mode]
+0=Infrastructure
+1=Ad-Hoc
+[ModelName]
+0=
+1=Wireless
+[Always]
+0=always
+[Usb]
+0=Usb not available
+[notConnected]
+0=Not Connected
+[errHttp]
+0=Http uploading is OK!
+1=Http connecting failed
+2=Http writing file failed
+[errFtp]
+0=Ftp uploading is OK!
+1=Ftp connecting failed
+2=Ftp writing file failed
+[errEmail]
+0=Email server setting is OK!
+1=Email sending failed
+[errSamba]
+0=Server write test is OK!
+1=The server has already mounted using the old setting. Test stopped.
+2=Server mounting failed
+3=File writing failed
+[testFtp]
+0=This is a ftp test
+[testSamba]
+0=This is a samba test
+[testEmail]
+0=Test mail
+[testEmailTitle]
+0=Test mail
+[errFile]
+0=The file is not a valid config file
+[noFile]
+0=No file
+[noFileReboot]
+0=No file, system reboot 
+[updateRun]
+0=firmware updating process is already running
+[notCorrect]
+0=not a correct model, system reboot
+[notValid]
+0=not a valid firmware, system reboot
+[fileErr]
+0=File error, system reboot
+[3gpp]
+0=Disable
+1=Enable With Audio
+2=Enable Without Audio

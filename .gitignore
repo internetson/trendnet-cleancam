@@ -1,0 +1,30 @@
+# Build outputs & temporary directories
+build/
+dist/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary media & logs
+*.raw
+*.wav
+*.mkv
+*.log
+scratch/
+
+# Toolchains & archives
+zig_toolchain/
+*.zip
+*.tar.gz
+
+# Generated firmware packages (releases are published via GitHub Releases)
+*.pck
+!firmware/*.pck
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+.vscode/
+.idea/

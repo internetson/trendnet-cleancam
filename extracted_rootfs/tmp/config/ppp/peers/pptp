@@ -1,0 +1,19 @@
+# name of tunnel, used to select lines in secrets files
+remotename pptp
+
+# name of tunnel, used to name /var/run pid file
+linkname pptp
+
+# data stream for pppd to use
+#<< wan_pptp
+pty "pptp 10.7.7.80 --nolaunchpppd"
+#>> wan_pptp
+#pty "pptp 10.7.7.80 --nolaunchpppd"
+
+# domain and username, used to select lines in secrets files
+name admtek
+
+# do not require the server to authenticate to our client
+noauth
+
+file /etc/ppp/options.pptp

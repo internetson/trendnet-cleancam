@@ -1,0 +1,12 @@
+[main]
+filter=0
+debug=7
+authhidden=1
+
+[url]
+/mpgview.htm=/guest/mpgview.htm
+/jpgview.htm=/guest/jpgview.htm
+/cgi/mpeg4/mpeg4.cgi=/guest/mpeg4.cgi
+/cgi/mjpg/mjpeg.cgi=/guest/mjpeg.cgi
+/view2.cgi=/guest/view2.cgi
+
