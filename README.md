@@ -1,7 +1,7 @@
 # TRENDnet TV-IP121W Custom Pro Firmware
 
 [![Build & Release](https://github.com/internetson/trendnet-cleancam/actions/workflows/release.yml/badge.svg)](https://github.com/internetson/trendnet-cleancam/actions/workflows/release.yml)
-[![Firmware Version](https://img.shields.io/badge/firmware-v1.1.2--Pro-blue.svg)](https://github.com/internetson/trendnet-cleancam/releases)
+[![Firmware Version](https://img.shields.io/badge/firmware-v1.1.2-blue.svg)](https://github.com/internetson/trendnet-cleancam/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 Кастомная современная прошивка для сетевой IP-камеры **TRENDnet TV-IP121W (TV-IP121WN)** с нативным RTSP-сервером, передачей звука, откалиброванным динамическим диапазоном матрицы и современным адаптивным веб-интерфейсом.
@@ -17,10 +17,6 @@
 * **Откалиброванное качество изображения (RFC 2435 In-Band DQT):**
   * Исправлена проблема выцветшего серого изображения и заниженного контраста на RTSP.
   * В заголовок RTP-пакетов внедряется аппаратная таблица квантования (DQT) сенсора камеры (`Q = 128`), восстанавливая полный динамический диапазон **0..255** и глубокий черный цвет.
-* **Управление ИК-подсветкой и ночным режимом:**
-  * Режимы: Авто (по датчику CDS с защитой от мерцания), Всегда ВКЛ, Всегда ВЫКЛ.
-  * Аппаратное накопление экспозиции матрицы OmniVision (`psensor -night=0..3` от 30 fps до 3.75 fps для полной темноты).
-  * Устранение аппаратного дребезга и ложных срабатываний от отражения ИК-лучей (микро-проба 80 мс с настраиваемой задержкой).
 * **Современный Web-интерфейс (HTML5):**
   * Темная адаптивная тема для ПК и смартфонов.
   * Полноценная форма авторизации с сохранением сессии.
@@ -56,15 +52,15 @@
 camera:
   - platform: generic
     name: "TRENDnet Camera"
-    stream_source: "rtsp://admin:admin@10.10.11.135:554/live"
-    still_image_url: "http://admin:admin@10.10.11.135/cgi/jpg/image.cgi"
+    stream_source: "rtsp://admin:admin@<IP КАМЕРЫ>:554/live"
+    still_image_url: "http://admin:admin@<IP КАМЕРЫ>/cgi/jpg/image.cgi"
     authentication: basic
     verify_ssl: false
 ```
 
 Либо добавьте камеру через стандартную интеграцию **Generic Camera** в интерфейсе Home Assistant:
-* **Still Image URL:** `http://10.10.11.135/cgi/jpg/image.cgi`
-* **Stream Source URL:** `rtsp://10.10.11.135:554/live`
+* **Still Image URL:** `http://<IP КАМЕРЫ>/cgi/jpg/image.cgi`
+* **Stream Source URL:** `rtsp://<IP КАМЕРЫ>:554/live`
 * **Username:** `admin`
 * **Password:** `admin`
 * **RTSP transport:** `TCP`
@@ -96,7 +92,7 @@ python tools/flash_firmware.py <IP_КАМЕРЫ> FW_TV-IP121W_Custom_Pro_v1.1.2.
 ```bash
 # Клонирование репозитория
 git clone https://github.com/internetson/trendnet-cleancam.git
-cd trendnet-tv-ip121w-custom
+cd trendnet-cleancam
 
 # Полная сборка (автоматически компилирует C-код и упаковывает Minix rootfs)
 python build.py
@@ -120,18 +116,13 @@ python build.py
 │   ├── FW_TV-IP121W_1.1.1...pck # Базовая оригинальная прошивка
 │   └── Firmware Upgrade...pdf   # Документация производителя
 ├── src/
-│   ├── ir_ctrl.c                # Аппаратный контроллер ИК-подсветки и сенсора (PL1029 GPIO)
 │   ├── rtspd.c                  # Исходный код RTSP-сервера (RFC 2435 + Audio + DQT)
 │   └── set_osd_corner.c         # Утилита перемещения OSD через IPC Shared Memory
 ├── tools/
 │   ├── flash_firmware.py        # Утилита прошивки камеры по сети
 │   └── telnet_cmd.py            # Утилита удаленного выполнения команд через Telnet
 ├── extracted_rootfs/            # Дерево файлов корневой файловой системы
-│   ├── sbin/
-│   │   ├── ir_ctrl              # Скомпилированный контроллер ИК
-│   │   ├── irled.sh             # Демон управления ИК с гистерезисом
-│   │   ├── rtspd                # Скомпилированный RTSP-демон
-│   │   └── set_osd_corner       # Утилита OSD
+│   ├── sbin/rtspd               # Скомпилированный RTSP-демон
 │   └── server/cgi-bin/
 │       ├── custom_api.cgi       # REST API сервер
 │       └── index.html           # Современный Web UI
