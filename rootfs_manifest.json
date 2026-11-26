@@ -531,7 +531,7 @@
   },
   "etc/rc.d/init.d/camserv.sh": {
     "type": "file",
-    "size": 1278,
+    "size": 1307,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -619,7 +619,7 @@
   },
   "etc/rc.d/init.d/daemon.sh": {
     "type": "file",
-    "size": 1136,
+    "size": 0,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -1594,7 +1594,7 @@
   },
   "sbin/settz": {
     "type": "file",
-    "size": 3732,
+    "size": 233,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -1889,7 +1889,7 @@
   },
   "server/cgi-bin/index.html": {
     "type": "file",
-    "size": 47106,
+    "size": 63904,
     "mode": 33188,
     "uid": 0,
     "gid": 0,
@@ -5363,7 +5363,7 @@
   },
   "sbin/rtspd": {
     "type": "file",
-    "size": 54616,
+    "size": 11676,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -5371,7 +5371,7 @@
   },
   "server/rtspd": {
     "type": "file",
-    "size": 54616,
+    "size": 11676,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -5379,7 +5379,7 @@
   },
   "server/cgi-bin/custom_api.cgi": {
     "type": "file",
-    "size": 12459,
+    "size": 15442,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -5387,7 +5387,7 @@
   },
   "server/cgi-bin/cgi/custom_api.cgi": {
     "type": "file",
-    "size": 12963,
+    "size": 15442,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -5395,7 +5395,7 @@
   },
   "sbin/set_osd_corner": {
     "type": "file",
-    "size": 4824,
+    "size": 1228,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -5427,7 +5427,7 @@
   },
   "sbin/ir_ctrl": {
     "type": "file",
-    "size": 7200,
+    "size": 1864,
     "mode": 33261,
     "uid": 0,
     "gid": 0,
@@ -5437,6 +5437,38 @@
     "type": "file",
     "size": 5242,
     "mode": 33261,
+    "uid": 0,
+    "gid": 0,
+    "mtime": 1364182749
+  },
+  "sbin/ha_osd": {
+    "type": "file",
+    "size": 14016,
+    "mode": 33261,
+    "uid": 0,
+    "gid": 0,
+    "mtime": 1364182749
+  },
+  "lib/libha_osd.so": {
+    "type": "file",
+    "size": 5988,
+    "mode": 33261,
+    "uid": 0,
+    "gid": 0,
+    "mtime": 1364182749
+  },
+  "sbin/settz.orig": {
+    "type": "file",
+    "size": 3732,
+    "mode": 33261,
+    "uid": 0,
+    "gid": 0,
+    "mtime": 1364182749
+  },
+  "tmp/config/ha_osd.conf": {
+    "type": "file",
+    "size": 94,
+    "mode": 33188,
     "uid": 0,
     "gid": 0,
     "mtime": 1364182749

@@ -33,18 +33,37 @@ def find_zig():
                     return os.path.join(root, f)
     return None
 
-def compile_and_patch_armv4(zig_bin, source_file, output_bin):
+def compile_and_patch_armv4(zig_bin, source_file, output_bin, shared=False):
     os.makedirs(os.path.dirname(output_bin) or ".", exist_ok=True)
-    cmd = [
-        zig_bin, "cc",
-        "-target", "arm-freestanding-eabi",
-        "-mcpu=arm7tdmi",
-        "-nostdlib",
-        "-O2",
-        source_file,
-        "-o", output_bin,
-        "-Wl,-e,_start"
-    ]
+    if shared:
+        cmd = [
+            zig_bin, "cc",
+            "-target", "arm-linux-gnueabi",
+            "-mcpu=arm7tdmi",
+            "-nostdlib",
+            "-shared",
+            "-fPIC",
+            "-O2",
+            "-s",
+            "-Wl,-z,max-page-size=4096",
+            "-Wl,-z,norelro",
+            source_file,
+            "-o", output_bin
+        ]
+    else:
+        cmd = [
+            zig_bin, "cc",
+            "-target", "arm-freestanding-eabi",
+            "-mcpu=arm7tdmi",
+            "-nostdlib",
+            "-O2",
+            "-s",
+            "-Wl,-z,max-page-size=4096",
+            "-Wl,-z,norelro",
+            source_file,
+            "-o", output_bin,
+            "-Wl,-e,_start"
+        ]
     print(f"  [CC] Compiling {source_file} -> {output_bin}...")
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
@@ -101,19 +120,50 @@ def compile_all_sources():
         compile_and_patch_armv4(zig, ir_c, out_ir)
         shutil.copy2(out_ir, "extracted_rootfs/sbin/ir_ctrl")
 
+    # 4. ha_osd
+    ha_c = "src/ha_osd.c"
+    if os.path.exists(ha_c):
+        out_ha = os.path.join(build_dir, "ha_osd")
+        compile_and_patch_armv4(zig, ha_c, out_ha)
+        shutil.copy2(out_ha, "extracted_rootfs/sbin/ha_osd")
+
+    # 5. libha_osd.so
+    libha_c = "src/libha_osd.c"
+    if os.path.exists(libha_c):
+        out_libha = os.path.join(build_dir, "libha_osd.so")
+        compile_and_patch_armv4(zig, libha_c, out_libha, shared=True)
+        shutil.copy2(out_libha, "extracted_rootfs/lib/libha_osd.so")
+
     # Update manifest with actual file sizes
     manifest_path = "rootfs_manifest.json"
     if os.path.exists(manifest_path):
         with open(manifest_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
-        for key in ["sbin/rtspd", "server/rtspd", "sbin/set_osd_corner", "sbin/ir_ctrl", "sbin/irled.sh"]:
+        tracked_keys = [
+            ("sbin/rtspd", 33261),
+            ("server/rtspd", 33261),
+            ("sbin/set_osd_corner", 33261),
+            ("sbin/ir_ctrl", 33261),
+            ("sbin/irled.sh", 33261),
+            ("sbin/ha_osd", 33261),
+            ("lib/libha_osd.so", 33261),
+            ("sbin/settz", 33261),
+            ("sbin/settz.orig", 33261),
+            ("tmp/config/ha_osd.conf", 33188),
+            ("etc/rc.d/init.d/camserv.sh", 33261),
+            ("etc/rc.d/init.d/daemon.sh", 33261),
+            ("server/cgi-bin/cgi/custom_api.cgi", 33261),
+            ("server/cgi-bin/custom_api.cgi", 33261),
+            ("server/cgi-bin/index.html", 33188),
+        ]
+        for key, default_mode in tracked_keys:
             local_file = os.path.join("extracted_rootfs", key.replace("/", os.sep))
             if os.path.exists(local_file):
                 if key not in manifest:
                     manifest[key] = {
                         "type": "file",
                         "size": os.path.getsize(local_file),
-                        "mode": 33261,
+                        "mode": default_mode,
                         "uid": 0,
                         "gid": 0,
                         "mtime": 1364182749

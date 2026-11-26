@@ -26,6 +26,19 @@ get_val() {
     echo "$res"
 }
 
+get_val_dec() {
+    raw=$(get_val "$1")
+    [ -z "$raw" ] && return
+    /sbin/ha_osd --urldecode "$raw"
+}
+
+get_ha_cfg() {
+    [ -f /tmp/config/ha_osd.conf ] || return
+    while IFS='=' read -r k v; do
+        [ "$k" = "$1" ] && echo "$v" && return
+    done < /tmp/config/ha_osd.conf
+}
+
 ACTION=$(get_val "action")
 
 case "$ACTION" in
@@ -87,6 +100,15 @@ case "$ACTION" in
         
         ir_info=$(/sbin/irled.sh status 2>/dev/null)
         [ -z "$ir_info" ] && ir_info='{"mode":"auto","led":0,"sensor":"unknown","night":2,"delay":5}'
+
+        ha_en=$(get_ha_cfg "enable")
+        ha_url=$(get_ha_cfg "url")
+        ha_tok=$(get_ha_cfg "token")
+        ha_cor=$(get_ha_cfg "corner")
+        ha_inv=$(get_ha_cfg "invert")
+        ha_int=$(get_ha_cfg "interval")
+        ha_lay=$(get_ha_cfg "layout")
+        ha_sen=$(get_ha_cfg "sensors")
         
         cat <<JSON_DATA_EOF
 {
@@ -144,7 +166,17 @@ case "$ACTION" in
     "uptime": "${uptime_sec:-0}",
     "version": "1.1.2-custom-rtsp-pro"
   },
-  "ir": $ir_info
+  "ir": $ir_info,
+  "ha_osd": {
+    "enable": "${ha_en:-0}",
+    "url": "${ha_url:-http://192.168.1.100:8123}",
+    "token": "${ha_tok:-}",
+    "corner": "${ha_cor:-2}",
+    "invert": "${ha_inv:-0}",
+    "interval": "${ha_int:-30}",
+    "layout": "${ha_lay:-0}",
+    "sensors": "${ha_sen:-}"
+  }
 }
 JSON_DATA_EOF
         ;;
@@ -213,40 +245,71 @@ JSON_DATA_EOF
         restart_camsvr=0
         if [ -n "$cor" ]; then
             /sbin/cfg -a w -p /server video.ini osd corner "$cor"
-            killall camsvr 2>/dev/null
-            sleep 1
-            [ ! -f /tmp/camsvr ] && cp /server/camsvr /tmp/camsvr && chmod +x /tmp/camsvr
-            /sbin/set_osd_corner "$cor" >/dev/null 2>&1
             restart_camsvr=1
         fi
         
         if [ -n "$inv" ]; then
             /sbin/cfg -a w -p /server video.ini osd invert "$inv"
-            if [ "$inv" = "1" ]; then
-                cp /server/digits_inv.bmp /tmp/digits.bmp
-            else
-                cp /server/digits_norm.bmp /tmp/digits.bmp
-            fi
             restart_camsvr=1
         fi
         
         if [ "$restart_camsvr" = "1" ]; then
-            killall camsvr 2>/dev/null
-            sleep 1
-            cd /server && /tmp/camsvr &
-            sleep 1
-            /etc/init.d/sensorctl.sh >/dev/null 2>&1
+            /etc/init.d/camserv.sh restart >/dev/null 2>&1
+            /sbin/rtspd >/dev/null 2>&1 &
+            (/etc/init.d/http.sh restart) >/dev/null 2>&1 &
         else
             cd /server && ./notify 9 1 >/dev/null 2>&1
         fi
         
+        /sbin/ha_osd --once >/dev/null 2>&1 &
         /etc/init.d/savecfg.sh >/dev/null 2>&1 &
         echo '{"status":"ok","message":"Параметры OSD применены"}'
+        ;;
+
+    set_ha_osd)
+        ha_en=$(get_val_dec "enable")
+        ha_url=$(get_val_dec "url")
+        ha_tok=$(get_val_dec "token")
+        ha_cor=$(get_val_dec "corner")
+        ha_inv=$(get_val_dec "invert")
+        ha_int=$(get_val_dec "interval")
+        ha_lay=$(get_val_dec "layout")
+        ha_sen=$(get_val_dec "sensors")
+
+        cat <<HA_CFG_EOF > /tmp/config/ha_osd.conf
+enable=${ha_en:-0}
+url=${ha_url:-}
+token=${ha_tok:-}
+corner=${ha_cor:-2}
+invert=${ha_inv:-0}
+interval=${ha_int:-30}
+layout=${ha_lay:-0}
+sensors=${ha_sen:-}
+HA_CFG_EOF
+
+        p=$(pidof ha_osd)
+        [ -n "$p" ] && kill $p 2>/dev/null
+        /sbin/ha_osd >/dev/null 2>&1 &
+        /etc/init.d/savecfg.sh >/dev/null 2>&1 &
+        echo '{"status":"ok","message":"Настройки Home Assistant OSD сохранены"}'
+        ;;
+
+    test_ha_osd)
+        /sbin/ha_osd --once
         ;;
 
     get_ir)
         ir_info=$(/sbin/irled.sh status 2>/dev/null)
         [ -z "$ir_info" ] && ir_info='{"mode":"auto","led":0,"sensor":"unknown","night":2,"delay":5}'
+
+        ha_en=$(get_ha_cfg "enable")
+        ha_url=$(get_ha_cfg "url")
+        ha_tok=$(get_ha_cfg "token")
+        ha_cor=$(get_ha_cfg "corner")
+        ha_inv=$(get_ha_cfg "invert")
+        ha_int=$(get_ha_cfg "interval")
+        ha_lay=$(get_ha_cfg "layout")
+        ha_sen=$(get_ha_cfg "sensors")
         echo "{\"status\":\"ok\",\"ir\":$ir_info}"
         ;;
 
@@ -324,14 +387,15 @@ JSON_DATA_EOF
         ;;
 
     set_time)
-        manual_time=$(get_val "datetime")
-        tz=$(get_val "timezone")
-        ntp_ip=$(get_val "ntp_ip")
+        manual_time=$(get_val_dec "datetime")
+        tz=$(get_val_dec "timezone")
+        ntp_ip=$(get_val_dec "ntp_ip")
         sched=$(get_val "sync_schedule")
         [ -n "$manual_time" ] && /bin/date -s "$manual_time" 2>/dev/null
         [ -n "$tz" ] && /sbin/cfg -a w sys.conf DATETIME TimeZone "$tz" && /sbin/settz
         [ -n "$ntp_ip" ] && /sbin/cfg -a w sys.conf DATETIME "NTP IP" "$ntp_ip"
         [ -n "$sched" ] && /sbin/cfg -a w sys.conf DATETIME "Sync Schedule" "$sched"
+        [ -n "$ntp_ip" ] && /etc/rc.d/init.d/ntpc.sh >/dev/null 2>&1 &
         /etc/init.d/savecfg.sh >/dev/null 2>&1 &
         echo '{"status":"ok","message":"Настройки времени обновлены"}'
         ;;

@@ -465,6 +465,88 @@
             </div>
           </div>
         </div>
+
+        <div class="card" style="grid-column: 1 / -1;">
+          <h2 class="card-title">🏠 Сенсоры Home Assistant на OSD</h2>
+          <div class="grid" style="gap:14px;">
+            <div>
+              <div class="form-group">
+                <label>Статус вывода на OSD</label>
+                <select id="ha_enable">
+                  <option value="0">Выключено</option>
+                  <option value="1">Включено (накладывать на видео)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>URL Home Assistant (HTTP в локальной сети)</label>
+                <input type="text" id="ha_url" placeholder="http://192.168.1.100:8123">
+              </div>
+              <div class="form-group">
+                <label>Long-Lived Access Token</label>
+                <input type="password" id="ha_token" placeholder="eyJhbGciOiJIUzI1NiIs...">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group">
+                  <label>Угол экрана</label>
+                  <select id="ha_corner">
+                    <option value="0">↖ Сверху слева</option>
+                    <option value="1">↗ Сверху справа</option>
+                    <option value="2">↙ Снизу слева</option>
+                    <option value="3">↘ Снизу справа</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Цветовая схема</label>
+                  <select id="ha_invert">
+                    <option value="0">⚪ Белый на тёмном</option>
+                    <option value="1">⚫ Чёрный на светлом</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group">
+                  <label>Компоновка</label>
+                  <select id="ha_layout">
+                    <option value="0">По строкам</option>
+                    <option value="1">В одну строку (через |)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Интервал опроса (сек)</label>
+                  <input type="number" id="ha_interval" min="5" max="3600" value="30">
+                </div>
+              </div>
+            </div>
+            <div>
+              <label style="display:block; margin-bottom:8px; font-size:13px; color:var(--text-muted);">Сенсоры (до 4 штук): Entity ID | Подпись | Ед. изм. (необяз.)</label>
+              <div style="display:grid; grid-template-columns:2fr 1.3fr 0.7fr; gap:6px; margin-bottom:8px;">
+                <input type="text" id="ha_s0_id" placeholder="sensor.kitchen_temp">
+                <input type="text" id="ha_s0_lbl" placeholder="Кухня:">
+                <input type="text" id="ha_s0_unit" placeholder="°C">
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.3fr 0.7fr; gap:6px; margin-bottom:8px;">
+                <input type="text" id="ha_s1_id" placeholder="sensor.kitchen_humidity">
+                <input type="text" id="ha_s1_lbl" placeholder="Влажн:">
+                <input type="text" id="ha_s1_unit" placeholder="%">
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.3fr 0.7fr; gap:6px; margin-bottom:8px;">
+                <input type="text" id="ha_s2_id" placeholder="sensor.outdoor_temp">
+                <input type="text" id="ha_s2_lbl" placeholder="Улица:">
+                <input type="text" id="ha_s2_unit" placeholder="°C">
+              </div>
+              <div style="display:grid; grid-template-columns:2fr 1.3fr 0.7fr; gap:6px; margin-bottom:12px;">
+                <input type="text" id="ha_s3_id" placeholder="sensor.power_watts">
+                <input type="text" id="ha_s3_lbl" placeholder="Мощн:">
+                <input type="text" id="ha_s3_unit" placeholder="W">
+              </div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn" style="flex:1;" onclick="saveHaOsdSettings()">💾 Сохранить Home Assistant OSD</button>
+                <button class="btn btn-secondary" style="flex:1; margin-top:0;" onclick="testHaOsdSettings()">🔄 Проверить сейчас</button>
+              </div>
+              <div id="ha_test_res" style="margin-top:10px; font-size:12px; font-family:monospace; color:#38bdf8; white-space:pre-wrap;"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -749,6 +831,24 @@
         document.getElementById('osd_opaque').checked = (d.osd.opaque === "1");
         if (d.osd.corner !== undefined) document.getElementById('osd_corner').value = d.osd.corner;
         if (d.osd.invert !== undefined) document.getElementById('osd_invert').value = d.osd.invert;
+
+        // Home Assistant OSD
+        if (d.ha_osd) {
+          document.getElementById('ha_enable').value = d.ha_osd.enable || '0';
+          document.getElementById('ha_url').value = d.ha_osd.url || '';
+          document.getElementById('ha_token').value = d.ha_osd.token || '';
+          document.getElementById('ha_corner').value = d.ha_osd.corner || '2';
+          document.getElementById('ha_invert').value = d.ha_osd.invert || '0';
+          document.getElementById('ha_layout').value = d.ha_osd.layout || '0';
+          document.getElementById('ha_interval').value = d.ha_osd.interval || '30';
+          const items = (d.ha_osd.sensors || '').split(';');
+          for (let i = 0; i < 4; i++) {
+            const parts = (items[i] || '').split('|');
+            document.getElementById(`ha_s${i}_id`).value = parts[0] || '';
+            document.getElementById(`ha_s${i}_lbl`).value = parts[1] || '';
+            document.getElementById(`ha_s${i}_unit`).value = parts[2] || '';
+          }
+        }
 
         // Audio
         document.getElementById('aud_mic').checked = (d.audio.microphone === "1");
@@ -1055,6 +1155,47 @@
       osdState = (en === '1' ? 1 : 0);
       document.getElementById('btnOSD').classList.toggle('active', osdState === 1);
       showToast('Параметры OSD применены. Штамп обновлен!');
+    }
+
+    async function saveHaOsdSettings() {
+      const en = document.getElementById('ha_enable').value;
+      const url = document.getElementById('ha_url').value.trim();
+      const tok = document.getElementById('ha_token').value.trim();
+      const cor = document.getElementById('ha_corner').value;
+      const inv = document.getElementById('ha_invert').value;
+      const lay = document.getElementById('ha_layout').value;
+      const iv = document.getElementById('ha_interval').value || '30';
+      const arr = [];
+      for (let i = 0; i < 4; i++) {
+        const eid = document.getElementById(`ha_s${i}_id`).value.trim();
+        const lbl = document.getElementById(`ha_s${i}_lbl`).value.trim();
+        const unit = document.getElementById(`ha_s${i}_unit`).value.trim();
+        if (eid) arr.push(`${eid}|${lbl}|${unit}`);
+      }
+      const body = `enable=${encodeURIComponent(en)}&url=${encodeURIComponent(url)}&token=${encodeURIComponent(tok)}&corner=${cor}&invert=${inv}&layout=${lay}&interval=${encodeURIComponent(iv)}&sensors=${encodeURIComponent(arr.join(';'))}`;
+      await fetch(`/cgi/custom_api.cgi?action=set_ha_osd&${body}`);
+      showToast('Настройки Home Assistant OSD сохранены!');
+    }
+
+    async function testHaOsdSettings() {
+      await saveHaOsdSettings();
+      const el = document.getElementById('ha_test_res');
+      el.style.color = '#94a3b8';
+      el.innerText = 'Запрос к Home Assistant...';
+      try {
+        const r = await fetch('/cgi/custom_api.cgi?action=test_ha_osd', { cache: 'no-store' });
+        const j = await r.json();
+        if (j.status === 'ok') {
+          el.style.color = '#10b981';
+          el.innerText = j.enabled ? ('OSD текст:\n' + (j.lines || []).join('\n')) : 'Вывод отключен (enable=0)';
+        } else {
+          el.style.color = '#ef4444';
+          el.innerText = 'Ошибка: ' + (j.message || 'unknown');
+        }
+      } catch (e) {
+        el.style.color = '#ef4444';
+        el.innerText = 'Ошибка запроса: ' + e;
+      }
     }
 
     async function saveAudioSettings() {

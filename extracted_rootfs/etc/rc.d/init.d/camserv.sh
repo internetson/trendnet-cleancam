@@ -22,7 +22,7 @@ start() {
 		/sbin/set_osd_corner "$corner" /tmp/camsvr
 	fi
 
-	cd /server; /tmp/camsvr &
+	cd /server; LD_PRELOAD=/lib/libha_osd.so /tmp/camsvr &
 	sleep 1
 	# init sensor default values
 	/etc/init.d/sensorctl.sh
